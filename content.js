@@ -148,4 +148,54 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   sendResponse?.({ success });
 });
 
+
+function ensureFilterMatrixPanel() {
+  const root = document.documentElement;
+  if (!root) return;
+  let launcher = document.getElementById("filter-matrix-launcher");
+  let frame = document.getElementById("filter-matrix-fullscreen-panel");
+  if (!launcher) {
+    launcher = document.createElement("button");
+    launcher.id = "filter-matrix-launcher";
+    launcher.type = "button";
+    launcher.textContent = "◈";
+    launcher.title = "Open Filter Matrix";
+    launcher.setAttribute("aria-label", "Open Filter Matrix");
+    launcher.style.cssText = "position:fixed!important;left:16px!important;bottom:16px!important;z-index:2147483647!important;width:42px!important;height:42px!important;border:1px solid rgba(255,255,255,.3)!important;border-radius:14px!important;background:linear-gradient(135deg,#8b7cff,#41d8c7)!important;color:#07101d!important;font:700 22px/1 system-ui!important;box-shadow:0 5px 24px rgba(0,0,0,.35)!important;cursor:pointer!important;pointer-events:auto!important";
+    launcher.addEventListener("click", openFilterMatrixPanel);
+    root.appendChild(launcher);
+  }
+  if (!frame) {
+    frame = document.createElement("iframe");
+    frame.id = "filter-matrix-fullscreen-panel";
+    frame.title = "Filter Matrix full-screen controls";
+    frame.src = chrome.runtime.getURL("popup.html?fullscreen=1");
+    frame.allow = "clipboard-read; clipboard-write";
+    frame.style.cssText = "position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;z-index:2147483647!important;background:#0b1020!important;display:none!important;pointer-events:auto!important";
+    root.appendChild(frame);
+  }
+}
+function openFilterMatrixPanel() {
+  ensureFilterMatrixPanel();
+  const frame = document.getElementById("filter-matrix-fullscreen-panel");
+  const launcher = document.getElementById("filter-matrix-launcher");
+  if (frame) frame.style.setProperty("display","block","important");
+  if (launcher) launcher.style.setProperty("display","none","important");
+}
+function closeFilterMatrixPanel() {
+  const frame = document.getElementById("filter-matrix-fullscreen-panel");
+  const launcher = document.getElementById("filter-matrix-launcher");
+  if (frame) frame.style.setProperty("display","none","important");
+  if (launcher) launcher.style.setProperty("display","block","important");
+}
+chrome.runtime.onMessage.addListener((message,sender,sendResponse)=>{
+  if(message?.type==="FILTER_MATRIX_OPEN_PANEL"){openFilterMatrixPanel();sendResponse?.({success:true});return;}
+});
+window.addEventListener("message",event=>{
+  const frame=document.getElementById("filter-matrix-fullscreen-panel");
+  if(!frame||event.source!==frame.contentWindow)return;
+  if(event.data?.type==="FILTER_MATRIX_PANEL_CLOSE"){closeFilterMatrixPanel();return;}
+  if(event.data?.type==="FILTER_MATRIX_PANEL_APPLY"){applyFilters(event.data.filters);return;}
+});
+
 }
