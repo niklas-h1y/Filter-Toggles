@@ -1,9 +1,9 @@
 const DEFAULT_FILTERS = {
   grayscale: 0, contrast: 100, invert: 0, hue: 0, sepia: 0, saturate: 100,
-  brightness: 100, blur: 0, opacity: 100, shadow: 0, temperature: 0,
+  brightness: 100, blur: 0, opacity: 100, shadow: 0, temperature: 0, filterMode: "auto", advancedEffects: [],
   blueLight: 0, vignette: 0, grain: 0, tintStrength: 0, tintColor: "#ff9a5c"
 };
-const RANGE_FILTERS = Object.keys(DEFAULT_FILTERS).filter((key) => key !== "tintColor");
+const RANGE_FILTERS = Object.keys(DEFAULT_FILTERS).filter((key) => key !== "tintColor" && key !== "filterMode" && key !== "advancedEffects");
 const PRESETS = {
   original: { ...DEFAULT_FILTERS },
   warm: { ...DEFAULT_FILTERS, temperature: 35, sepia: 18, saturate: 112, contrast: 105 },
@@ -33,9 +33,11 @@ function renderControls(values) {
     if (output) output.textContent = formatValue(id, input.value);
   });
   document.getElementById("tintColor").value = values.tintColor || DEFAULT_FILTERS.tintColor;
+  document.getElementById("filterMode").value = values.filterMode || "auto";
+  document.querySelectorAll("[data-advanced-effect]").forEach((input) => { input.checked = (values.advancedEffects || []).includes(input.value); });
 }
 function readControls() {
-  const values = { tintColor: document.getElementById("tintColor").value };
+  const values = { tintColor: document.getElementById("tintColor").value, filterMode: document.getElementById("filterMode").value, advancedEffects: [...document.querySelectorAll("[data-advanced-effect]:checked")].map((input) => input.value) };
   RANGE_FILTERS.forEach((id) => {
     const input = document.getElementById(id);
     if (input) values[id] = Number(input.value);
@@ -91,7 +93,7 @@ function saveAndApply() {
   });
 }
 function setPreset(name) {
-  const values = PRESETS[name];
+  const values = { ...PRESETS[name], filterMode: "auto", advancedEffects: [] };
   if (!values) return;
   renderControls(values);
   chrome.storage.local.set(values, () => {
@@ -115,6 +117,7 @@ RANGE_FILTERS.forEach((id) => {
   });
 });
 document.getElementById("tintColor").addEventListener("input", saveAndApply);
+document.getElementById("filterMode").addEventListener("change", saveAndApply);
 document.getElementById("apply-btn").addEventListener("click", saveAndApply);
 document.getElementById("reset-btn").addEventListener("click", () => setPreset("original"));
 document.querySelectorAll("[data-preset]").forEach((button) => {
@@ -126,3 +129,16 @@ const scheduleIds=Object.keys(scheduleDefaults),scheduleInputs=Object.fromEntrie
 function updateScheduleNote(s){document.getElementById("scheduleFields").classList.toggle("disabled",!s.autoScheduleEnabled);document.getElementById("scheduleNote").textContent=s.autoScheduleEnabled?`On · ${s.nightPreset} from ${s.nightStart} to ${s.dayStart} (local time)`:"Off · Set times to match local sunset and sunrise.";}
 function saveSchedule(){const s={};scheduleIds.forEach(k=>s[k]=k==="autoScheduleEnabled"?scheduleInputs[k].checked:scheduleInputs[k].value);chrome.storage.local.set({...s,autoLastPeriod:""},()=>{if(chrome.runtime.lastError){setStatus("Could not save schedule",true);return;}updateScheduleNote(s);chrome.runtime.sendMessage({type:"FILTER_MATRIX_SCHEDULE_CHANGED"},r=>{const e=chrome.runtime.lastError;if(e||!r?.success)setStatus("Schedule saved; reload extension",true);else setStatus(s.autoScheduleEnabled?"Automatic schedule enabled":"Automatic schedule disabled");});});}
 chrome.storage.local.get(scheduleDefaults,s=>{if(chrome.runtime.lastError)return;scheduleIds.forEach(k=>{const el=scheduleInputs[k];if(k==="autoScheduleEnabled")el.checked=Boolean(s[k]);else el.value=s[k];el.addEventListener("change",saveSchedule);});updateScheduleNote(s);});
+
+function renderAdvancedCatalog() {
+  const host = document.getElementById("advancedFilterGroups");
+  if (!host || !globalThis.FILTER_MATRIX_CATALOG) return;
+  host.innerHTML = FILTER_MATRIX_CATALOG.groups.map(function(group, index) {
+    const options = group.items.map(function(name) {
+      return '<label class="filter-chip"><input type="checkbox" data-advanced-effect value="' + name + '"><span>' + name + '</span></label>';
+    }).join("");
+    return '<details class="filter-group" ' + (index === 0 ? 'open' : '') + '><summary>' + group.name + '<span>' + group.items.length + ' options</span></summary><div class="filter-chip-grid">' + options + '</div></details>';
+  }).join("");
+  host.querySelectorAll("[data-advanced-effect]").forEach(function(input) { input.addEventListener("change", saveAndApply); });
+}
+renderAdvancedCatalog();
