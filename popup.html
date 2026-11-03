@@ -31,10 +31,10 @@
 <div class="control"><label class="control-label" for="vignette"><span>Vignette</span><span class="control-value" id="val-vignette">0%</span></label><input type="range" id="vignette" min="0" max="100" value="0"></div>
 <div class="control full"><label class="control-label" for="grain"><span>Film grain</span><span class="control-value" id="val-grain">0%</span></label><input type="range" id="grain" min="0" max="100" value="0"></div>
 </div></section>
-<section class="card"><h2 class="card-title"><span class="icon">◉</span> Custom color wash</h2><div class="controls">
+<section class="card advanced-card"><h2 class="card-title"><span class="icon">▦</span> Advanced filter library</h2><p class="advanced-copy">Enable creative looks and SVG filter primitives. Standard sliders remain available above.</p><div class="mode-row"><label for="filterMode">CSS filter property mode</label><select id="filterMode"><option value="auto">Combine active filters</option><option value="none">none</option><option value="inherit">inherit</option><option value="initial">initial</option><option value="revert">revert</option><option value="revert-layer">revert-layer</option><option value="unset">unset</option><option value="url">url( generated SVG filter )</option></select></div><div id="advancedFilterGroups"></div></section><section class="card"><h2 class="card-title"><span class="icon">◉</span> Custom color wash</h2><div class="controls">
 <div class="control"><label class="control-label" for="tintColor"><span>Tint color</span></label><input type="color" id="tintColor" value="#ff9a5c"></div>
 <div class="control"><label class="control-label" for="tintStrength"><span>Tint strength</span><span class="control-value" id="val-tintStrength">0%</span></label><input type="range" id="tintStrength" min="0" max="100" value="0"></div>
 </div></section>
 </main>
 <footer><button class="action" id="reset-btn" type="button">↺ Reset all</button><button class="action primary" id="apply-btn" type="button">Apply settings</button></footer>
-</div><script src="popup.js"></script></body></html>
+</div><script src="filter-catalog.js"></script><script src="popup.js"></script></body></html>
