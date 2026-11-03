@@ -12,6 +12,7 @@ const DEFAULT_FILTERS = {
 };
 
 let styleEl;
+let pendingFilters = DEFAULT_FILTERS;
 
 function ensureStyleElement() {
   if (styleEl?.isConnected) return styleEl;
@@ -36,10 +37,11 @@ function normalizeFilters(filters = {}) {
 }
 
 function applyFilters(filters) {
+  pendingFilters = normalizeFilters(filters);
   const target = ensureStyleElement();
   if (!target) return;
 
-  const f = normalizeFilters(filters);
+  const f = pendingFilters;
   target.textContent = `
     html {
       filter:
@@ -57,14 +59,16 @@ function applyFilters(filters) {
   `;
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  if (!styleEl?.isConnected) applyFilters(pendingFilters);
+}, { once: true });
+
 chrome.storage.local.get(DEFAULT_FILTERS, applyFilters);
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName !== "local") return;
   const changed = Object.keys(DEFAULT_FILTERS).some((key) => key in changes);
-  if (!changed) return;
-
-  chrome.storage.local.get(DEFAULT_FILTERS, applyFilters);
+  if (changed) chrome.storage.local.get(DEFAULT_FILTERS, applyFilters);
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
