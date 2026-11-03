@@ -1,37 +1,74 @@
-// Initialize or update the persistent style element
-let styleEl = document.getElementById('matrix-filter-style');
-if (!styleEl) {
-  styleEl = document.createElement('style');
-  styleEl.id = 'matrix-filter-style';
-  document.documentElement.appendChild(styleEl);
+const DEFAULT_FILTERS = {
+  grayscale: 0,
+  contrast: 100,
+  invert: 0,
+  hue: 0,
+  sepia: 0,
+  saturate: 100,
+  brightness: 100,
+  blur: 0,
+  opacity: 100,
+  shadow: 0
+};
+
+let styleEl;
+
+function ensureStyleElement() {
+  if (styleEl?.isConnected) return styleEl;
+  if (!document.documentElement) return null;
+
+  styleEl = document.getElementById("matrix-filter-style");
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = "matrix-filter-style";
+    (document.head || document.documentElement).appendChild(styleEl);
+  }
+  return styleEl;
 }
 
-// Fetch existing configurations on load
-chrome.storage.local.get(['grayscale', 'contrast', 'invert', 'hue', 'sepia', 'saturate', 'brightness'], (result) => {
-  if (result.contrast !== undefined) {
-    applyFilters(result);
-  }
-});
+function normalizeFilters(filters = {}) {
+  return Object.fromEntries(
+    Object.entries(DEFAULT_FILTERS).map(([key, fallback]) => {
+      const value = Number(filters[key]);
+      return [key, Number.isFinite(value) ? value : fallback];
+    })
+  );
+}
 
-// Listen for updates from the popup matrix UI
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'UPDATE_FILTERS') {
-    applyFilters(message.filters);
-  }
-});
+function applyFilters(filters) {
+  const target = ensureStyleElement();
+  if (!target) return;
 
-function applyFilters(f) {
-  const filterString = `
+  const f = normalizeFilters(filters);
+  target.textContent = `
     html {
-      filter: 
-        grayscale(${f.grayscale}%) 
-        contrast(${f.contrast}%) 
-        invert(${f.invert}%) 
-        hue-rotate(${f.hue}deg) 
-        sepia(${f.sepia}%) 
-        saturate(${f.saturate}%) 
-        brightness(${f.brightness}%) !important;
+      filter:
+        grayscale(${f.grayscale}%)
+        contrast(${f.contrast}%)
+        invert(${f.invert}%)
+        hue-rotate(${f.hue}deg)
+        sepia(${f.sepia}%)
+        saturate(${f.saturate}%)
+        brightness(${f.brightness}%)
+        blur(${f.blur}px)
+        opacity(${f.opacity}%)
+        drop-shadow(0 0 ${f.shadow}px rgba(0, 0, 0, 0.65)) !important;
     }
   `;
-  styleEl.textContent = filterString;
 }
+
+chrome.storage.local.get(DEFAULT_FILTERS, applyFilters);
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "local") return;
+  const changed = Object.keys(DEFAULT_FILTERS).some((key) => key in changes);
+  if (!changed) return;
+
+  chrome.storage.local.get(DEFAULT_FILTERS, applyFilters);
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type !== "UPDATE_FILTERS") return;
+  applyFilters(message.filters);
+  sendResponse?.({ success: true });
+});
