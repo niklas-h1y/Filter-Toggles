@@ -2,17 +2,21 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      width: 260px;
+      width: 280px;
+      max-height: 580px;
+      overflow-y: auto;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: #121212;
       color: #e0e0e0;
       margin: 0;
       padding: 15px;
+      box-sizing: border-box;
     }
     h3 {
-      margin: 0 0 15px 0;
+      margin: 0 0 15px;
       font-weight: 600;
       font-size: 16px;
       letter-spacing: 0.5px;
@@ -20,9 +24,7 @@
       border-bottom: 1px solid #2d2d2d;
       padding-bottom: 8px;
     }
-    .filter-group {
-      margin-bottom: 12px;
-    }
+    .filter-group { margin-bottom: 12px; }
     .filter-label {
       display: flex;
       justify-content: space-between;
@@ -38,11 +40,7 @@
       border-radius: 2px;
       outline: none;
     }
-    .btn-container {
-      margin-top: 15px;
-      display: flex;
-      gap: 8px;
-    }
+    .btn-container { margin-top: 15px; display: flex; gap: 8px; }
     button {
       flex: 1;
       background: #2d2d2d;
@@ -55,60 +53,70 @@
       font-weight: 500;
       transition: background 0.2s;
     }
-    button:hover {
-      background: #3d3d3d;
-    }
-    #reset-btn {
-      background: #ff3b30;
-    }
-    #reset-btn:hover {
-      background: #e0352b;
+    button:hover { background: #3d3d3d; }
+    button:focus-visible, input:focus-visible { outline: 2px solid #69aaff; outline-offset: 3px; }
+    #reset-btn { background: #ff3b30; }
+    #reset-btn:hover { background: #e0352b; }
+    .section-label {
+      color: #777;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 16px 0 10px;
     }
   </style>
 </head>
 <body>
   <h3>Filter Matrix</h3>
-  
+  <div class="section-label">Color &amp; light</div>
+
   <div class="filter-group">
-    <div class="filter-label"><span>Grayscale</span><span id="val-grayscale">0%</span></div>
+    <label class="filter-label" for="grayscale"><span>Grayscale</span><span id="val-grayscale">0%</span></label>
     <input type="range" id="grayscale" min="0" max="100" value="0">
   </div>
-
   <div class="filter-group">
-    <div class="filter-label"><span>Contrast</span><span id="val-contrast">100%</span></div>
+    <label class="filter-label" for="contrast"><span>Contrast</span><span id="val-contrast">100%</span></label>
     <input type="range" id="contrast" min="0" max="1000" value="100">
   </div>
-
   <div class="filter-group">
-    <div class="filter-label"><span>Invert</span><span id="val-invert">0%</span></div>
+    <label class="filter-label" for="invert"><span>Invert</span><span id="val-invert">0%</span></label>
     <input type="range" id="invert" min="0" max="100" value="0">
   </div>
-
   <div class="filter-group">
-    <div class="filter-label"><span>Hue Rotate</span><span id="val-hue">0°</span></div>
+    <label class="filter-label" for="hue"><span>Hue rotate</span><span id="val-hue">0°</span></label>
     <input type="range" id="hue" min="0" max="360" value="0">
   </div>
-
   <div class="filter-group">
-    <div class="filter-label"><span>Sepia</span><span id="val-sepia">0%</span></div>
+    <label class="filter-label" for="sepia"><span>Sepia</span><span id="val-sepia">0%</span></label>
     <input type="range" id="sepia" min="0" max="100" value="0">
   </div>
-
   <div class="filter-group">
-    <div class="filter-label"><span>Saturate</span><span id="val-saturate">100%</span></div>
+    <label class="filter-label" for="saturate"><span>Saturation</span><span id="val-saturate">100%</span></label>
     <input type="range" id="saturate" min="0" max="500" value="100">
   </div>
-
   <div class="filter-group">
-    <div class="filter-label"><span>Brightness</span><span id="val-brightness">100%</span></div>
+    <label class="filter-label" for="brightness"><span>Brightness</span><span id="val-brightness">100%</span></label>
     <input type="range" id="brightness" min="0" max="200" value="100">
   </div>
 
-  <div class="btn-container">
-    <button id="preset-warm">Warm Dark</button>
-    <button id="reset-btn">Reset</button>
+  <div class="section-label">Effects</div>
+  <div class="filter-group">
+    <label class="filter-label" for="blur"><span>Blur</span><span id="val-blur">0 px</span></label>
+    <input type="range" id="blur" min="0" max="20" value="0">
+  </div>
+  <div class="filter-group">
+    <label class="filter-label" for="opacity"><span>Opacity</span><span id="val-opacity">100%</span></label>
+    <input type="range" id="opacity" min="0" max="100" value="100">
+  </div>
+  <div class="filter-group">
+    <label class="filter-label" for="shadow"><span>Drop shadow</span><span id="val-shadow">0 px</span></label>
+    <input type="range" id="shadow" min="0" max="30" value="0">
   </div>
 
+  <div class="btn-container">
+    <button id="preset-warm" type="button">Warm</button>
+    <button id="reset-btn" type="button">Reset</button>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>
