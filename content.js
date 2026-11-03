@@ -161,7 +161,7 @@ function ensureFilterMatrixPanel() {
     launcher.textContent = "◈";
     launcher.title = "Open Filter Matrix";
     launcher.setAttribute("aria-label", "Open Filter Matrix");
-    launcher.style.cssText = "position:fixed!important;left:16px!important;bottom:16px!important;z-index:2147483647!important;width:42px!important;height:42px!important;border:1px solid rgba(255,255,255,.3)!important;border-radius:14px!important;background:linear-gradient(135deg,#8b7cff,#41d8c7)!important;color:#07101d!important;font:700 22px/1 system-ui!important;box-shadow:0 5px 24px rgba(0,0,0,.35)!important;cursor:pointer!important;pointer-events:auto!important";
+    launcher.style.cssText = "position:fixed!important;right:16px!important;bottom:16px!important;left:auto!important;z-index:2147483647!important;width:42px!important;height:42px!important;border:1px solid rgba(255,255,255,.3)!important;border-radius:14px!important;background:linear-gradient(135deg,#8b7cff,#41d8c7)!important;color:#07101d!important;font:700 22px/1 system-ui!important;box-shadow:0 5px 24px rgba(0,0,0,.35)!important;cursor:pointer!important;pointer-events:auto!important";
     launcher.addEventListener("click", openFilterMatrixPanel);
     root.appendChild(launcher);
   }
@@ -197,5 +197,18 @@ window.addEventListener("message",event=>{
   if(event.data?.type==="FILTER_MATRIX_PANEL_CLOSE"){closeFilterMatrixPanel();return;}
   if(event.data?.type==="FILTER_MATRIX_PANEL_APPLY"){applyFilters(event.data.filters);return;}
 });
+
+// Open the control center automatically on every page load. The user can dismiss
+// it with × or Escape; the bottom-right launcher remains available to reopen it.
+function initializeFilterMatrixPanel() {
+  ensureFilterMatrixPanel();
+  openFilterMatrixPanel();
+}
+if (document.documentElement) {
+  initializeFilterMatrixPanel();
+} else {
+  document.addEventListener("DOMContentLoaded", initializeFilterMatrixPanel, { once: true });
+}
+
 
 }
