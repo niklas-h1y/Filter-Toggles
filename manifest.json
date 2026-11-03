@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Multi-Filter Matrix",
-  "version": "1.0",
-  "description": "Toggle and chain native GPU-accelerated graphic filters on any webpage.",
+  "version": "1.1.0",
+  "description": "Adjust color, light, blur, opacity, and shadow filters on webpages.",
   "permissions": [
     "activeTab",
     "scripting",
