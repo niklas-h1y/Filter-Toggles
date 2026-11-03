@@ -1,3 +1,6 @@
+if (!globalThis.__filterMatrixContentLoaded) {
+  globalThis.__filterMatrixContentLoaded = true;
+
 const DEFAULT_FILTERS = {
   grayscale: 0, contrast: 100, invert: 0, hue: 0, sepia: 0, saturate: 100,
   brightness: 100, blur: 0, opacity: 100, shadow: 0, temperature: 0,
@@ -144,3 +147,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const success = applyFilters(message.filters);
   sendResponse?.({ success });
 });
+
+}
