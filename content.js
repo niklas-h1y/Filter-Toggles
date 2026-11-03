@@ -198,11 +198,10 @@ window.addEventListener("message",event=>{
   if(event.data?.type==="FILTER_MATRIX_PANEL_APPLY"){applyFilters(event.data.filters);return;}
 });
 
-// Open the control center automatically on every page load. The user can dismiss
-// it with × or Escape; the bottom-right launcher remains available to reopen it.
+// Keep the control center closed on page load. The bottom-right launcher
+// remains visible and opens the panel when the user chooses.
 function initializeFilterMatrixPanel() {
   ensureFilterMatrixPanel();
-  openFilterMatrixPanel();
 }
 if (document.documentElement) {
   initializeFilterMatrixPanel();
