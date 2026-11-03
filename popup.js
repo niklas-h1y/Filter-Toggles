@@ -1,72 +1,94 @@
-const filters = ['grayscale', 'contrast', 'invert', 'hue', 'sepia', 'saturate', 'brightness'];
+const DEFAULT_FILTERS = {
+  grayscale: 0,
+  contrast: 100,
+  invert: 0,
+  hue: 0,
+  sepia: 0,
+  saturate: 100,
+  brightness: 100,
+  blur: 0,
+  opacity: 100,
+  shadow: 0
+};
 
-// Load saved settings
-chrome.storage.local.get(filters, (result) => {
-  filters.forEach(f => {
-    const input = document.getElementById(f);
-    if (result[f] !== undefined) {
-      input.value = result[f];
-    }
-    updateLabel(f, input.value);
-    input.addEventListener('input', (e) => {
-      updateLabel(f, e.target.value);
+const FILTERS = Object.keys(DEFAULT_FILTERS);
+const warmPreset = {
+  ...DEFAULT_FILTERS,
+  contrast: 105,
+  hue: 350,
+  sepia: 25,
+  saturate: 120
+};
+
+function updateLabel(id, value) {
+  const label = document.getElementById(`val-${id}`);
+  if (!label) return;
+  label.textContent = id === "hue"
+    ? `${value}°`
+    : (id === "blur" || id === "shadow" ? `${value} px` : `${value}%`);
+}
+
+function readControls() {
+  return Object.fromEntries(
+    FILTERS.map((id) => [id, Number(document.getElementById(id).value)])
+  );
+}
+
+function renderControls(values) {
+  FILTERS.forEach((id) => {
+    const input = document.getElementById(id);
+    input.value = values[id] ?? DEFAULT_FILTERS[id];
+    updateLabel(id, input.value);
+  });
+}
+
+function applyToActiveTab(filters) {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (chrome.runtime.lastError || !tabs?.[0]?.id) return;
+    chrome.tabs.sendMessage(
+      tabs[0].id,
+      { type: "UPDATE_FILTERS", filters },
+      () => {
+        // Restricted browser pages (for example chrome:// pages) do not accept content scripts.
+        void chrome.runtime.lastError;
+      }
+    );
+  });
+}
+
+function saveAndApply() {
+  const data = readControls();
+  chrome.storage.local.set(data, () => {
+    if (chrome.runtime.lastError) return;
+    applyToActiveTab(data);
+  });
+}
+
+chrome.storage.local.get(DEFAULT_FILTERS, (saved) => {
+  if (chrome.runtime.lastError) return;
+  const values = { ...DEFAULT_FILTERS, ...saved };
+  renderControls(values);
+
+  FILTERS.forEach((id) => {
+    document.getElementById(id).addEventListener("input", (event) => {
+      updateLabel(id, event.target.value);
       saveAndApply();
     });
   });
 });
 
-function updateLabel(id, val) {
-  const label = document.getElementById(`val-${id}`);
-  if (id === 'hue') {
-    label.innerText = `${val}°`;
-  } else {
-    label.innerText = `${val}%`;
-  }
-}
-
-function saveAndApply() {
-  const data = {};
-  filters.forEach(f => {
-    data[f] = document.getElementById(f).value;
-  });
-  
-  chrome.storage.local.set(data, () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, { type: 'UPDATE_FILTERS', filters: data });
-      }
-    });
-  });
-}
-
-document.getElementById('reset-btn').addEventListener('click', () => {
-  const defaults = { grayscale: 0, contrast: 100, invert: 0, hue: 0, sepia: 0, saturate: 100, brightness: 100 };
-  chrome.storage.local.set(defaults, () => {
-    filters.forEach(f => {
-      const input = document.getElementById(f);
-      input.value = defaults[f];
-      updateLabel(f, defaults[f]);
-    });
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, { type: 'UPDATE_FILTERS', filters: defaults });
-      }
-    });
+document.getElementById("reset-btn").addEventListener("click", () => {
+  chrome.storage.local.set(DEFAULT_FILTERS, () => {
+    if (chrome.runtime.lastError) return;
+    renderControls(DEFAULT_FILTERS);
+    applyToActiveTab(DEFAULT_FILTERS);
   });
 });
 
-document.getElementById('preset-warm').addEventListener('click', () => {
-  const preset = { grayscale: 0, contrast: 90, invert: 100, hue: 180, sepia: 40, saturate: 100, brightness: 100 };
-  chrome.storage.local.set(preset, () => {
-    filters.forEach(f => {
-      const input = document.getElementById(f);
-      input.value = preset[f];
-      updateLabel(f, preset[f]);
-    });
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, { type: 'UPDATE_FILTERS', filters: preset });
-      }
-    });
+document.getElementById("preset-warm").addEventListener("click", () => {
+  chrome.storage.local.set(warmPreset, () => {
+    if (chrome.runtime.lastError) return;
+    renderControls(warmPreset);
+    applyToActiveTab(warmPreset);
   });
 });
