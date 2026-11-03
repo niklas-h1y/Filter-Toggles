@@ -1,23 +1,24 @@
 # Filter Toggles
 
-A lightweight Chrome extension for adjusting CSS visual filters on webpages.
+A lightweight Manifest V3 Chrome extension for live visual adjustments to webpages.
 
-## Filters
+## Color and light
+- The complete set of ten standard CSS filter functions: grayscale, contrast, invert, hue rotation, sepia, saturation, brightness, blur, opacity, and drop shadow.
+- Additional warmth and blue-light reduction overlays.
 
-**Color & light**
-- Grayscale, contrast, invert, hue rotation, sepia, saturation, and brightness.
+## Effects and atmosphere
+- Vignette, film grain, and a custom color wash with a color picker and strength control.
 
-**Effects**
-- Blur, opacity, and drop shadow.
+## Quick looks
+- Original, Warm, Night, Mono, Cinema, and Soft presets.
+
+Settings are saved locally and restored when pages load. Effects are visual only and do not change the underlying page content.
 
 ## Install locally
-
 1. Download or clone this repository.
 2. Open `chrome://extensions` in Chrome.
 3. Enable **Developer mode**.
 4. Select **Load unpacked** and choose this project folder.
-5. Open a webpage and use the extension popup to adjust its filters.
+5. Open a webpage and use the extension popup.
 
-Filter values are saved with `chrome.storage.local` and restored when pages load. Use **Warm** for a warm color treatment or **Reset** to restore defaults.
-
-Some browser-internal pages and other restricted URLs do not allow extensions to inject content scripts; filters cannot be applied on those pages.
+Some browser-internal pages and other restricted URLs do not allow extensions to inject content scripts.
