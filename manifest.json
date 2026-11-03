@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Filter Matrix",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A complete library of CSS, SVG, and creative visual filters for webpages.",
   "permissions": [
     "activeTab",
