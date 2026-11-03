@@ -14,6 +14,8 @@ const PRESETS = {
 };
 
 const statusEl = document.getElementById("status");
+const fullScreenMode = new URLSearchParams(location.search).get("fullscreen") === "1";
+if (fullScreenMode) document.body.classList.add("fullscreen-mode");
 function setStatus(message, isError = false) {
   if (!statusEl) return;
   statusEl.textContent = message;
@@ -73,6 +75,7 @@ function sendFilters(tabId, filters) {
   });
 }
 function applyToActiveTab(filters) {
+  if (fullScreenMode) { window.parent.postMessage({ type: "FILTER_MATRIX_PANEL_APPLY", filters }, "*"); setStatus("Filters applied"); return; }
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const tabId = tabs?.[0]?.id;
     if (chrome.runtime.lastError || tabId == null) {
@@ -119,6 +122,9 @@ RANGE_FILTERS.forEach((id) => {
 document.getElementById("tintColor").addEventListener("input", saveAndApply);
 document.getElementById("filterMode").addEventListener("change", saveAndApply);
 document.getElementById("apply-btn").addEventListener("click", saveAndApply);
+document.getElementById("open-panel-btn").addEventListener("click", () => { chrome.tabs.query({active:true,currentWindow:true}, tabs => { const tabId=tabs?.[0]?.id; if(tabId==null){setStatus("No active tab",true);return;} chrome.tabs.sendMessage(tabId,{type:"FILTER_MATRIX_OPEN_PANEL"},response=>{if(chrome.runtime.lastError){chrome.scripting.executeScript({target:{tabId},files:["content.js"]},()=>{if(chrome.runtime.lastError){setStatus("This page blocks extensions",true);return;}chrome.tabs.sendMessage(tabId,{type:"FILTER_MATRIX_OPEN_PANEL"},()=>window.close());});}else window.close();}); }); });
+document.getElementById("close-panel").addEventListener("click",()=>window.parent.postMessage({type:"FILTER_MATRIX_PANEL_CLOSE"},"*"));
+if(fullScreenMode) document.addEventListener("keydown",event=>{if(event.key==="Escape")window.parent.postMessage({type:"FILTER_MATRIX_PANEL_CLOSE"},"*");});
 document.getElementById("reset-btn").addEventListener("click", () => setPreset("original"));
 document.querySelectorAll("[data-preset]").forEach((button) => {
   button.addEventListener("click", () => setPreset(button.dataset.preset));
@@ -140,5 +146,26 @@ function renderAdvancedCatalog() {
     return '<details class="filter-group" ' + (index === 0 ? 'open' : '') + '><summary>' + group.name + '<span>' + group.items.length + ' options</span></summary><div class="filter-chip-grid">' + options + '</div></details>';
   }).join("");
   host.querySelectorAll("[data-advanced-effect]").forEach(function(input) { input.addEventListener("change", saveAndApply); });
+  updateCatalogCount();
 }
 renderAdvancedCatalog();
+
+function updateCatalogCount() {
+  const count = document.querySelectorAll("[data-advanced-effect]:checked").length;
+  const label = document.getElementById("catalogCount");
+  if (label) label.textContent = count + " advanced effect" + (count === 1 ? "" : "s") + " enabled";
+}
+document.getElementById("filterSearch").addEventListener("input", event => {
+  const query = event.target.value.trim().toLowerCase();
+  document.querySelectorAll(".filter-group").forEach(group => {
+    let visible = 0;
+    group.querySelectorAll(".filter-chip").forEach(chip => {
+      const match = chip.textContent.toLowerCase().includes(query);
+      chip.hidden = !match;
+      if (match) visible++;
+    });
+    group.hidden = visible === 0;
+    if (query && visible) group.open = true;
+  });
+});
+document.getElementById("advancedFilterGroups").addEventListener("change", updateCatalogCount);
