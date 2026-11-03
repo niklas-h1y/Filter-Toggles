@@ -28,3 +28,9 @@ Some browser-internal pages and other restricted URLs do not allow extensions to
 - Choose both presets and local clock times (for example, set the evening switch to your usual sunset time).
 - The schedule is checked every minute, applies across open tabs, and follows timezone/daylight-saving changes.
 - This is a configurable clock schedule, not live astronomical sunset detection; it does not request location access.
+
+## Complete filter library (v1.4.0)
+- Standard CSS filter functions remain available through sliders.
+- CSS filter property modes include none, inherit, initial, revert, revert-layer, unset, and a generated SVG url() reference.
+- The advanced library includes CRT/scanline/noise/glitch effects, color treatments, stylized rendering looks, CSS text-shadow, box-shadow, mix-blend-mode, backdrop-filter, and the requested SVG fe* primitives.
+- SVG child nodes and lighting sources are applied through valid parent primitives rather than as invalid standalone filters. Named image-processing looks are browser-based approximations, not pixel-identical implementations of specialist image algorithms.

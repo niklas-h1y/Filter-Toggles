@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Filter Matrix",
-  "version": "1.3.0",
-  "description": "Fine-tune webpage colors, lighting, and creative visual effects.",
+  "version": "1.4.0",
+  "description": "A complete library of CSS, SVG, and creative visual filters for webpages.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -18,7 +18,9 @@
         "<all_urls>"
       ],
       "js": [
-        "content.js"
+        "filter-catalog.js",
+        "content.js",
+        "advanced-effects.js"
       ],
       "run_at": "document_start"
     }
