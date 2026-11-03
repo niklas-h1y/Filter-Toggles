@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Filter Matrix",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A complete library of CSS, SVG, and creative visual filters for webpages.",
   "permissions": [
     "activeTab",
@@ -30,5 +30,18 @@
   ],
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup.html",
+        "popup.css",
+        "popup.js",
+        "filter-catalog.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
 }

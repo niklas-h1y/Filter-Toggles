@@ -34,3 +34,6 @@ Some browser-internal pages and other restricted URLs do not allow extensions to
 - CSS filter property modes include none, inherit, initial, revert, revert-layer, unset, and a generated SVG url() reference.
 - The advanced library includes CRT/scanline/noise/glitch effects, color treatments, stylized rendering looks, CSS text-shadow, box-shadow, mix-blend-mode, backdrop-filter, and the requested SVG fe* primitives.
 - SVG child nodes and lighting sources are applied through valid parent primitives rather than as invalid standalone filters. Named image-processing looks are browser-based approximations, not pixel-identical implementations of specialist image algorithms.
+
+## Full-screen control center
+Open the extension popup and choose **Full screen** to open a full-viewport control center over the current webpage. Close it with the **×** button or Escape. A small Filter Matrix button stays at the bottom-left of the page and reopens the control center. The full-screen layout is responsive and includes searchable advanced effects. The browser's toolbar popup remains compact because browser extension popups cannot themselves expand to cover the browser window; the full-screen panel is an in-page extension overlay.
