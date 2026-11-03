@@ -22,3 +22,9 @@ Settings are saved locally and restored when pages load. Effects are visual only
 5. Open a webpage and use the extension popup.
 
 Some browser-internal pages and other restricted URLs do not allow extensions to inject content scripts.
+
+## Automatic system-time schedule
+- Optional toggle applies an evening preset and daytime preset automatically using the computer's local time.
+- Choose both presets and local clock times (for example, set the evening switch to your usual sunset time).
+- The schedule is checked every minute, applies across open tabs, and follows timezone/daylight-saving changes.
+- This is a configurable clock schedule, not live astronomical sunset detection; it does not request location access.

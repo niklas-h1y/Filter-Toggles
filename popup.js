@@ -120,3 +120,9 @@ document.getElementById("reset-btn").addEventListener("click", () => setPreset("
 document.querySelectorAll("[data-preset]").forEach((button) => {
   button.addEventListener("click", () => setPreset(button.dataset.preset));
 });
+
+const scheduleDefaults={autoScheduleEnabled:false,nightStart:"19:00",dayStart:"07:00",nightPreset:"night",dayPreset:"original"};
+const scheduleIds=Object.keys(scheduleDefaults),scheduleInputs=Object.fromEntries(scheduleIds.map(k=>[k,document.getElementById(k)]));
+function updateScheduleNote(s){document.getElementById("scheduleFields").classList.toggle("disabled",!s.autoScheduleEnabled);document.getElementById("scheduleNote").textContent=s.autoScheduleEnabled?`On · ${s.nightPreset} from ${s.nightStart} to ${s.dayStart} (local time)`:"Off · Set times to match local sunset and sunrise.";}
+function saveSchedule(){const s={};scheduleIds.forEach(k=>s[k]=k==="autoScheduleEnabled"?scheduleInputs[k].checked:scheduleInputs[k].value);chrome.storage.local.set({...s,autoLastPeriod:""},()=>{if(chrome.runtime.lastError){setStatus("Could not save schedule",true);return;}updateScheduleNote(s);chrome.runtime.sendMessage({type:"FILTER_MATRIX_SCHEDULE_CHANGED"},r=>{const e=chrome.runtime.lastError;if(e||!r?.success)setStatus("Schedule saved; reload extension",true);else setStatus(s.autoScheduleEnabled?"Automatic schedule enabled":"Automatic schedule disabled");});});}
+chrome.storage.local.get(scheduleDefaults,s=>{if(chrome.runtime.lastError)return;scheduleIds.forEach(k=>{const el=scheduleInputs[k];if(k==="autoScheduleEnabled")el.checked=Boolean(s[k]);else el.value=s[k];el.addEventListener("change",saveSchedule);});updateScheduleNote(s);});
