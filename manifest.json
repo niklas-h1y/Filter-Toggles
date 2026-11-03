@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Multi-Filter Matrix",
-  "version": "1.0",
-  "description": "Toggle and chain native GPU-accelerated graphic filters on any webpage.",
+  "name": "Filter Matrix",
+  "version": "1.2.0",
+  "description": "Fine-tune webpage colors, lighting, and creative visual effects.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -13,8 +13,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_start"
     }
   ]

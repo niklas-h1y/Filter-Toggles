@@ -1,114 +1,40 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body {
-      width: 260px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #121212;
-      color: #e0e0e0;
-      margin: 0;
-      padding: 15px;
-    }
-    h3 {
-      margin: 0 0 15px 0;
-      font-weight: 600;
-      font-size: 16px;
-      letter-spacing: 0.5px;
-      color: #fff;
-      border-bottom: 1px solid #2d2d2d;
-      padding-bottom: 8px;
-    }
-    .filter-group {
-      margin-bottom: 12px;
-    }
-    .filter-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      margin-bottom: 4px;
-      color: #aaa;
-    }
-    input[type="range"] {
-      width: 100%;
-      accent-color: #0076ff;
-      background: #2d2d2d;
-      height: 4px;
-      border-radius: 2px;
-      outline: none;
-    }
-    .btn-container {
-      margin-top: 15px;
-      display: flex;
-      gap: 8px;
-    }
-    button {
-      flex: 1;
-      background: #2d2d2d;
-      border: none;
-      color: #fff;
-      padding: 8px;
-      font-size: 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background: #3d3d3d;
-    }
-    #reset-btn {
-      background: #ff3b30;
-    }
-    #reset-btn:hover {
-      background: #e0352b;
-    }
-  </style>
-</head>
-<body>
-  <h3>Filter Matrix</h3>
-  
-  <div class="filter-group">
-    <div class="filter-label"><span>Grayscale</span><span id="val-grayscale">0%</span></div>
-    <input type="range" id="grayscale" min="0" max="100" value="0">
-  </div>
-
-  <div class="filter-group">
-    <div class="filter-label"><span>Contrast</span><span id="val-contrast">100%</span></div>
-    <input type="range" id="contrast" min="0" max="1000" value="100">
-  </div>
-
-  <div class="filter-group">
-    <div class="filter-label"><span>Invert</span><span id="val-invert">0%</span></div>
-    <input type="range" id="invert" min="0" max="100" value="0">
-  </div>
-
-  <div class="filter-group">
-    <div class="filter-label"><span>Hue Rotate</span><span id="val-hue">0°</span></div>
-    <input type="range" id="hue" min="0" max="360" value="0">
-  </div>
-
-  <div class="filter-group">
-    <div class="filter-label"><span>Sepia</span><span id="val-sepia">0%</span></div>
-    <input type="range" id="sepia" min="0" max="100" value="0">
-  </div>
-
-  <div class="filter-group">
-    <div class="filter-label"><span>Saturate</span><span id="val-saturate">100%</span></div>
-    <input type="range" id="saturate" min="0" max="500" value="100">
-  </div>
-
-  <div class="filter-group">
-    <div class="filter-label"><span>Brightness</span><span id="val-brightness">100%</span></div>
-    <input type="range" id="brightness" min="0" max="200" value="100">
-  </div>
-
-  <div class="btn-container">
-    <button id="preset-warm">Warm Dark</button>
-    <button id="reset-btn">Reset</button>
-  </div>
-
-  <script src="popup.js"></script>
-</body>
-</html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Filter Matrix</title><link rel="stylesheet" href="popup.css"></head>
+<body><div class="app">
+<header><div class="brand-row"><div class="brand"><div class="logo" aria-hidden="true">◈</div><div><h1>Filter Matrix</h1><p class="subtitle">Your page, your atmosphere.</p></div></div><div class="status">Live controls</div></div></header>
+<main>
+<div class="section-head"><h2>Quick looks</h2><span>One tap presets</span></div>
+<div class="presets" aria-label="Filter presets">
+<button class="preset" data-preset="original"><strong>Original</strong><small>Clean slate</small></button>
+<button class="preset" data-preset="warm"><strong>Warm</strong><small>Golden hour</small></button>
+<button class="preset" data-preset="night"><strong>Night</strong><small>Low light</small></button>
+<button class="preset" data-preset="mono"><strong>Mono</strong><small>Black &amp; white</small></button>
+<button class="preset" data-preset="cinema"><strong>Cinema</strong><small>Rich contrast</small></button>
+<button class="preset" data-preset="soft"><strong>Soft</strong><small>Gentle glow</small></button>
+</div>
+<section class="card"><h2 class="card-title"><span class="icon">◐</span> Color &amp; light</h2><div class="controls">
+<div class="control"><label class="control-label" for="brightness"><span>Brightness</span><span class="control-value" id="val-brightness">100%</span></label><input type="range" id="brightness" min="0" max="200" value="100"></div>
+<div class="control"><label class="control-label" for="contrast"><span>Contrast</span><span class="control-value" id="val-contrast">100%</span></label><input type="range" id="contrast" min="0" max="300" value="100"></div>
+<div class="control"><label class="control-label" for="saturate"><span>Saturation</span><span class="control-value" id="val-saturate">100%</span></label><input type="range" id="saturate" min="0" max="300" value="100"></div>
+<div class="control"><label class="control-label" for="hue"><span>Hue rotate</span><span class="control-value" id="val-hue">0°</span></label><input type="range" id="hue" min="0" max="360" value="0"></div>
+<div class="control"><label class="control-label" for="grayscale"><span>Grayscale</span><span class="control-value" id="val-grayscale">0%</span></label><input type="range" id="grayscale" min="0" max="100" value="0"></div>
+<div class="control"><label class="control-label" for="sepia"><span>Sepia</span><span class="control-value" id="val-sepia">0%</span></label><input type="range" id="sepia" min="0" max="100" value="0"></div>
+<div class="control"><label class="control-label" for="invert"><span>Invert</span><span class="control-value" id="val-invert">0%</span></label><input type="range" id="invert" min="0" max="100" value="0"></div>
+<div class="control"><label class="control-label" for="temperature"><span>Warmth</span><span class="control-value" id="val-temperature">0%</span></label><input type="range" id="temperature" min="0" max="100" value="0"></div>
+<div class="control full"><label class="control-label" for="blueLight"><span>Blue-light reduction</span><span class="control-value" id="val-blueLight">0%</span></label><input type="range" id="blueLight" min="0" max="100" value="0"></div>
+</div></section>
+<section class="card"><h2 class="card-title"><span class="icon">✧</span> Effects &amp; atmosphere</h2><div class="controls">
+<div class="control"><label class="control-label" for="blur"><span>Blur</span><span class="control-value" id="val-blur">0 px</span></label><input type="range" id="blur" min="0" max="20" value="0"></div>
+<div class="control"><label class="control-label" for="opacity"><span>Opacity</span><span class="control-value" id="val-opacity">100%</span></label><input type="range" id="opacity" min="0" max="100" value="100"></div>
+<div class="control"><label class="control-label" for="shadow"><span>Drop shadow</span><span class="control-value" id="val-shadow">0 px</span></label><input type="range" id="shadow" min="0" max="30" value="0"></div>
+<div class="control"><label class="control-label" for="vignette"><span>Vignette</span><span class="control-value" id="val-vignette">0%</span></label><input type="range" id="vignette" min="0" max="100" value="0"></div>
+<div class="control full"><label class="control-label" for="grain"><span>Film grain</span><span class="control-value" id="val-grain">0%</span></label><input type="range" id="grain" min="0" max="100" value="0"></div>
+</div></section>
+<section class="card"><h2 class="card-title"><span class="icon">◉</span> Custom color wash</h2><div class="controls">
+<div class="control"><label class="control-label" for="tintColor"><span>Tint color</span></label><input type="color" id="tintColor" value="#ff9a5c"></div>
+<div class="control"><label class="control-label" for="tintStrength"><span>Tint strength</span><span class="control-value" id="val-tintStrength">0%</span></label><input type="range" id="tintStrength" min="0" max="100" value="0"></div>
+</div></section>
+</main>
+<footer><button class="action" id="reset-btn" type="button">↺ Reset all</button><button class="action primary" id="apply-btn" type="button">Apply settings</button></footer>
+</div><script src="popup.js"></script></body></html>
