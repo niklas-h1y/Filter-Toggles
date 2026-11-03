@@ -1,94 +1,70 @@
 const DEFAULT_FILTERS = {
-  grayscale: 0,
-  contrast: 100,
-  invert: 0,
-  hue: 0,
-  sepia: 0,
-  saturate: 100,
-  brightness: 100,
-  blur: 0,
-  opacity: 100,
-  shadow: 0
+  grayscale: 0, contrast: 100, invert: 0, hue: 0, sepia: 0, saturate: 100,
+  brightness: 100, blur: 0, opacity: 100, shadow: 0, temperature: 0,
+  blueLight: 0, vignette: 0, grain: 0, tintStrength: 0, tintColor: "#ff9a5c"
 };
-
-const FILTERS = Object.keys(DEFAULT_FILTERS);
-const warmPreset = {
-  ...DEFAULT_FILTERS,
-  contrast: 105,
-  hue: 350,
-  sepia: 25,
-  saturate: 120
+const RANGE_FILTERS = Object.keys(DEFAULT_FILTERS).filter((key) => key !== "tintColor");
+const PRESETS = {
+  original: { ...DEFAULT_FILTERS },
+  warm: { ...DEFAULT_FILTERS, temperature: 35, sepia: 18, saturate: 112, contrast: 105 },
+  night: { ...DEFAULT_FILTERS, brightness: 78, contrast: 112, blueLight: 75, temperature: 22, vignette: 18 },
+  mono: { ...DEFAULT_FILTERS, grayscale: 100, contrast: 118, vignette: 24 },
+  cinema: { ...DEFAULT_FILTERS, contrast: 128, saturate: 118, vignette: 35, grain: 12, shadow: 2 },
+  soft: { ...DEFAULT_FILTERS, brightness: 108, contrast: 88, saturate: 88, temperature: 12 }
 };
-
-function updateLabel(id, value) {
-  const label = document.getElementById(`val-${id}`);
-  if (!label) return;
-  label.textContent = id === "hue"
-    ? `${value}°`
-    : (id === "blur" || id === "shadow" ? `${value} px` : `${value}%`);
+function formatValue(id, value) {
+  if (id === "hue") return `${value}°`;
+  if (id === "blur" || id === "shadow") return `${value} px`;
+  return `${value}%`;
 }
-
-function readControls() {
-  return Object.fromEntries(
-    FILTERS.map((id) => [id, Number(document.getElementById(id).value)])
-  );
-}
-
 function renderControls(values) {
-  FILTERS.forEach((id) => {
+  RANGE_FILTERS.forEach((id) => {
     const input = document.getElementById(id);
     input.value = values[id] ?? DEFAULT_FILTERS[id];
-    updateLabel(id, input.value);
+    document.getElementById(`val-${id}`).textContent = formatValue(id, input.value);
   });
+  document.getElementById("tintColor").value = values.tintColor || DEFAULT_FILTERS.tintColor;
 }
-
+function readControls() {
+  const values = { tintColor: document.getElementById("tintColor").value };
+  RANGE_FILTERS.forEach((id) => { values[id] = Number(document.getElementById(id).value); });
+  return values;
+}
 function applyToActiveTab(filters) {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (chrome.runtime.lastError || !tabs?.[0]?.id) return;
-    chrome.tabs.sendMessage(
-      tabs[0].id,
-      { type: "UPDATE_FILTERS", filters },
-      () => {
-        // Restricted browser pages (for example chrome:// pages) do not accept content scripts.
-        void chrome.runtime.lastError;
-      }
-    );
-  });
-}
-
-function saveAndApply() {
-  const data = readControls();
-  chrome.storage.local.set(data, () => {
-    if (chrome.runtime.lastError) return;
-    applyToActiveTab(data);
-  });
-}
-
-chrome.storage.local.get(DEFAULT_FILTERS, (saved) => {
-  if (chrome.runtime.lastError) return;
-  const values = { ...DEFAULT_FILTERS, ...saved };
-  renderControls(values);
-
-  FILTERS.forEach((id) => {
-    document.getElementById(id).addEventListener("input", (event) => {
-      updateLabel(id, event.target.value);
-      saveAndApply();
+    chrome.tabs.sendMessage(tabs[0].id, { type: "UPDATE_FILTERS", filters }, () => {
+      // Restricted pages do not accept extension content-script messages.
+      void chrome.runtime.lastError;
     });
   });
+}
+function saveAndApply() {
+  const values = readControls();
+  chrome.storage.local.set(values, () => {
+    if (!chrome.runtime.lastError) applyToActiveTab(values);
+  });
+}
+function setPreset(name) {
+  const values = PRESETS[name];
+  if (!values) return;
+  renderControls(values);
+  chrome.storage.local.set(values, () => {
+    if (!chrome.runtime.lastError) applyToActiveTab(values);
+  });
+}
+chrome.storage.local.get(DEFAULT_FILTERS, (saved) => {
+  if (!chrome.runtime.lastError) renderControls({ ...DEFAULT_FILTERS, ...saved });
 });
-
-document.getElementById("reset-btn").addEventListener("click", () => {
-  chrome.storage.local.set(DEFAULT_FILTERS, () => {
-    if (chrome.runtime.lastError) return;
-    renderControls(DEFAULT_FILTERS);
-    applyToActiveTab(DEFAULT_FILTERS);
+RANGE_FILTERS.forEach((id) => {
+  document.getElementById(id).addEventListener("input", (event) => {
+    document.getElementById(`val-${id}`).textContent = formatValue(id, event.target.value);
+    saveAndApply();
   });
 });
-
-document.getElementById("preset-warm").addEventListener("click", () => {
-  chrome.storage.local.set(warmPreset, () => {
-    if (chrome.runtime.lastError) return;
-    renderControls(warmPreset);
-    applyToActiveTab(warmPreset);
-  });
+document.getElementById("tintColor").addEventListener("input", saveAndApply);
+document.getElementById("apply-btn").addEventListener("click", saveAndApply);
+document.getElementById("reset-btn").addEventListener("click", () => setPreset("original"));
+document.querySelectorAll("[data-preset]").forEach((button) => {
+  button.addEventListener("click", () => setPreset(button.dataset.preset));
 });
